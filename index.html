@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohamed Ibrahim | Front End Web Developer</title>
+    <!-- React & Babel CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Google Fonts: Playfair Display for headers, Inter for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --background: #ffffff;
+            --foreground: #09090b;
+            --card: #ffffff;
+            --card-foreground: #09090b;
+            --popover: #ffffff;
+            --popover-foreground: #09090b;
+            --primary: #18181b;
+            --primary-foreground: #fafafa;
+            --secondary: #f4f4f5;
+            --secondary-foreground: #18181b;
+            --muted: #f4f4f5;
+            --muted-foreground: #71717a;
+            --accent: #f4f4f5;
+            --accent-foreground: #18181b;
+            --destructive: #ef4444;
+            --destructive-foreground: #fafafa;
+            --border: #e4e4e7;
+            --input: #e4e4e7;
+            --ring: #18181b;
+            --radius: 0.5rem;
+
+            --sidebar-width: 280px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        /* Three.js Canvas Container */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #root {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* shadcn-inspired buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            height: 2.5rem;
+            padding: 0 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            border-color: var(--border);
+            background-color: transparent;
+            color: var(--foreground);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--accent);
+            color: var(--accent-foreground);
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--foreground);
+        }
+
+        .btn-ghost:hover {
+            background-color: var(--accent);
+            color: var(--accent-foreground);
+        }
+
+        /* Floating Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - 40px);
+            background: var(--background);
+            position: sticky;
+            top: 20px;
+            left: 20px;
+            margin: 20px;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            border-radius: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            z-index: 100;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-left: 0.5rem;
+        }
+
+        .profile-img {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: none;
+            background: #f3f4f6;
+        }
+
+        .profile-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 0.125rem;
+        }
+
+        .profile-info p {
+            font-size: 0.875rem;
+            color: #71717a;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0.75rem;
+            text-decoration: none;
+            color: #52525b;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--foreground);
+        }
+
+        .nav-link.active {
+            color: var(--foreground);
+            font-weight: 600;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #f4f4f5;
+            margin: 2rem 0;
+            width: 100%;
+        }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bottom-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0.75rem;
+            text-decoration: none;
+            color: #52525b;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .bottom-link:hover {
+            color: var(--foreground);
+        }
+
+        .sidebar-footer {
+            display: none;
+            /* Removed the old horizontal footer */
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 4rem 10%;
+            max-width: 1200px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+        }
+
+        .greeting h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: #ecfdf5;
+            color: #065f46;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid #a7f3d0;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #10B981;
+            border-radius: 50%;
+        }
+
+        .intro-text {
+            font-size: 1.125rem;
+            color: var(--muted-foreground);
+            margin-bottom: 4rem;
+            max-width: 48rem;
+        }
+
+        .intro-text strong {
+            color: var(--foreground);
+            font-weight: 600;
+        }
+
+        /* shadcn-inspired Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .badge-secondary {
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+            border: transparent;
+        }
+
+        .badge-outline {
+            color: var(--foreground);
+        }
+
+        /* Project Cards - Vertical shadcn-style card */
+        .project-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .project-card:hover {
+            border-color: var(--ring);
+            background-color: var(--muted);
+        }
+
+        .project-image {
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            width: 100%;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .project-details {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-meta {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            margin-bottom: 8px;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* shadcn-inspired Card for sections */
+        .section-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            background: var(--card);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Testimonial Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .testimonial-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            background: var(--muted);
+        }
+
+        .testimonial-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-img {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .testimonial-quote {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--muted-foreground);
+            font-style: italic;
+        }
+
+        /* Research Projects Mini-Cards */
+        .research-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .research-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .research-item:hover {
+            background: var(--accent);
+        }
+
+        .research-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 4.5rem;
+                padding: 2rem 0.75rem;
+            }
+
+            .profile-info,
+            .nav-link span,
+            .nav-sub-menu,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                padding: 4rem 1.5rem;
+            }
+
+            .project-card {
+                grid-template-columns: 1fr;
+            }
+
+            .project-image {
+                height: 250px;
+                order: -1;
+                border-left: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .about-grid,
+            .research-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const ThreeBackground = () => {
+            const canvasRef = useRef();
+
+            useEffect(() => {
+                let mouseX = 0;
+                let mouseY = 0;
+                let windowHalfX = window.innerWidth / 2;
+                let windowHalfY = window.innerHeight / 2;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+                camera.position.z = 1000;
+
+                const renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvasRef.current, 
+                    alpha: true,
+                    antialias: true 
+                });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                // Particles
+                const particlesCount = 1500;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particlesCount * 3);
+
+                for (let i = 0; i < particlesCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 3000;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 2,
+                    color: 0x18181b, // Zinc-900 color
+                    transparent: true,
+                    opacity: 0.2
+                });
+
+                const particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+
+                const render = () => {
+                    requestAnimationFrame(render);
+                    
+                    // Subtle rotation
+                    particles.rotation.y += 0.001;
+                    
+                    // Mouse interaction
+                    camera.position.x += (mouseX - camera.position.x) * 0.05;
+                    camera.position.y += (-mouseY - camera.position.y) * 0.05;
+                    camera.lookAt(scene.position);
+
+                    renderer.render(scene, camera);
+                };
+
+                const onMouseMove = (event) => {
+                    mouseX = (event.clientX - windowHalfX) * 0.5;
+                    mouseY = (event.clientY - windowHalfY) * 0.5;
+                };
+
+                const onWindowResize = () => {
+                    windowHalfX = window.innerWidth / 2;
+                    windowHalfY = window.innerHeight / 2;
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('resize', onWindowResize);
+                render();
+
+                return () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('resize', onWindowResize);
+                };
+            }, []);
+
+            return <canvas id="bg-canvas" ref={canvasRef} />;
+        };
+
+
+        const Sidebar = () => (
+            <aside className="sidebar">
+                <div className="profile-section">
+                    <img src="./priya_portrait_1775821534011.png" alt="Priya Jain" className="profile-img" />
+                    <div className="profile-info">
+                        <h3>Mohamed Ibrahim</h3>
+                        <p>Front End Web Developer</p>
+                    </div>
+                </div>
+
+                <ul className="nav-menu">
+                    <li className="nav-item">
+                        <a href="#" className="nav-link active">
+                            <div className="nav-link-content">
+                                <i className="fa-solid fa-house" style={{width: '24px'}}></i>
+                                <span>Home</span>
+                            </div>
+                        </a>
+                    </li>
+                    
+                    <li className="nav-item">
+                        <a href="#" className="nav-link">
+                            <div className="nav-link-content">
+                                <i className="fa-solid fa-user" style={{width: '24px'}}></i>
+                                <span>About</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <li className="nav-item">
+                        <a href="#" className="nav-link">
+                            <div className="nav-link-content">
+                                <i className="fa-solid fa-wand-magic-sparkles" style={{width: '24px'}}></i>
+                                <span>Work Experience</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+
+                <div className="divider"></div>
+
+                <div className="sidebar-bottom">
+                    <a href="#" className="bottom-link">
+                        {/* Direct SVG for LinkedIn to ensure it appears */}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                            <rect x="2" y="9" width="4" height="12"></rect>
+                            <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                        <span>LinkedIn</span>
+                    </a>
+                    <a href="#" className="bottom-link">
+                        {/* Direct SVG for Resumé (Geometric style) */}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2L2 19.72a.73.73 0 0 0 .63 1.08H21.37a.73.73 0 0 0 .63-1.08L12 2z"></path>
+                            <path d="M12 21.01V2"></path>
+                        </svg>
+                        <span>Resumé</span>
+                    </a>
+                </div>
+            </aside>
+        );
+
+        const ProjectCard = ({ title, meta, tags, image }) => (
+            <a href="#" className="project-card">
+                <div className="project-image" style={{ backgroundImage: `url(${image})` }}></div>
+                <div className="project-details">
+                    <span className="project-meta">{meta}</span>
+                    <h3 className="project-title">{title}</h3>
+                    <div className="project-tags">
+                        {tags.map(tag => <span key={tag} className="badge badge-secondary">{tag}</span>)}
+                    </div>
+                </div>
+            </a>
+        );
+
+        const App = () => {
+            const interests = ["Reflection", "Human Interaction", "Well-being", "Theory of Mind", "Social Computing", "AI Research"];
+
+            return (
+                <React.Fragment>
+                    <ThreeBackground />
+                    <Sidebar />
+                    <main className="main-content">
+                        <header>
+                            <div className="greeting">
+                                <h1>Hi, I'm Ibrahim!</h1>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div className="status-badge">
+                                    <span className="dot"></span>
+                                    Open to Relocation
+                                </div>
+                                <a href="#" className="btn btn-primary">Resume</a>
+                            </div>
+                        </header>
+
+                        <div className="intro-text">
+                            <p style={{marginBottom: '1.5rem'}}>Currently, I specialize in <strong>building custom WordPress solutions and full-stack web applications</strong> for early-stage startups and global brands. I focus on bridging the gap between design and development by delivering <strong>high-performance systems</strong> that are as visually compelling as they are technically sound.</p>
+                            <p>Alongside this, I manage <strong>full-stack configurations and SEO strategies</strong>, ensuring every site is not only beautiful but also secure, scalable, and search-engine friendly. I am most interested in projects where <strong>technical precision and user-centric design intersect</strong> to drive measurable growth.</p>
+                        </div>
+
+                        <h2 className="section-title">Research Interests</h2>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '4rem' }}>
+                            {interests.map(interest => (
+                                <span key={interest} className="badge badge-outline" style={{ padding: '0.5rem 1rem' }}>{interest}</span>
+                            ))}
+                        </div>
+
+                        <div className="projects-section">
+                            <h2 className="section-title">Featured Projects</h2>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+                                <ProjectCard
+                                    meta="Community Platform • UX Design"
+                                    title="Karma-based reward system for community platform"
+                                    tags={["UX Design", "Gamification"]}
+                                    image="./project_karma_1775821553664.png"
+                                />
+                                <ProjectCard
+                                    meta="Mobile App • Product Strategy"
+                                    title="User onboarding redesign for community engagement"
+                                    tags={["Activation", "Engagement"]}
+                                    image="./project_onboarding_1775821567686.png"
+                                />
+                                <ProjectCard
+                                    meta="Branding • Web Design"
+                                    title="Brand identity and visual language for an Italian label"
+                                    tags={["Branding", "Visual Identity"]}
+                                    image="./project_clothing_brand_1775821585978.png"
+                                />
+                            </div>
+                        </div>
+
+                        <section className="section-card">
+                            <div className="about-grid">
+                                <div>
+                                    <h2 className="section-title">About Me</h2>
+                                    <p style={{ color: 'var(--muted-foreground)', fontSize: '0.875rem', lineHeight: '1.7' }}>
+                                        A graduate student at Indiana University's HCI/design program, where I operate as independent-framed, meaningful, problem-conscious rigorous designer rooted in systems-level. I love working with researchers and engineers to build things that matter. Before this, I worked at several early-stage startups where I helped them transition from 0 to 1.
+                                    </p>
+                                    <div style={{ marginTop: '1.5rem' }}>
+                                        <a href="#" className="btn btn-outline">Read full story</a>
+                                    </div>
+                                </div>
+                                <div className="testimonial-card">
+                                    <div className="testimonial-profile">
+                                        <img src="./priya_portrait_1775821534011.png" alt="Testimonial" className="testimonial-img" />
+                                        <div>
+                                            <p style={{ fontSize: '0.875rem', fontWeight: '600' }}>Tian</p>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>IU Student Assistant</p>
+                                        </div>
+                                    </div>
+                                    <p className="testimonial-quote">"Priya has the rare ability to bridge the gap between abstract research findings and concrete design solutions. She is a joy to work with!"</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <h2 className="section-title">Research Projects</h2>
+                        <div className="research-grid">
+                            <div className="research-item">
+                                <h3>How do people evaluate their interactions with AI? A qualitative study.</h3>
+                                <div className="project-tags">
+                                    <span className="badge badge-secondary">AI Research</span>
+                                    <span className="badge badge-outline">HCI</span>
+                                </div>
+                            </div>
+                            <div className="research-item">
+                                <h3>Exploring the impact of social feedback on user retention.</h3>
+                                <div className="project-tags">
+                                    <span className="badge badge-secondary">Social Computing</span>
+                                    <span className="badge badge-outline">UX Research</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <footer>
+                            <p>Thank you for visiting!</p>
+                            <p>© 2024 Priya Jain • Built with React & CDN</p>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <a href="#" className="nav-sub-link">LinkedIn</a>
+                                <a href="#" className="nav-sub-link">Twitter</a>
+                            </div>
+                        </footer>
+                    </main>
+                </React.Fragment>
+            );
+        };
+
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
