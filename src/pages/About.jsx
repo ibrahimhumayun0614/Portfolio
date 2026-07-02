@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Reveal from '../components/Reveal'
 import './About.css'
 
 const leftParagraphs = [
@@ -47,21 +48,29 @@ function About() {
   return (
     <section className="about">
       <div className="about__content">
-        <Link to="/" className="about__back">
-          ← Home
-        </Link>
+        <Reveal immediate>
+          <Link to="/" className="about__back">
+            ← Home
+          </Link>
+        </Reveal>
 
-        <h1 className="about__title">Hey, I&apos;m Mohamed!</h1>
+        <Reveal delay={80}>
+          <h1 className="about__title">Hey, I&apos;m Mohamed!</h1>
+        </Reveal>
 
         <div className="about__columns">
           <div className="about__column">
             {leftParagraphs.map((paragraph, index) => (
-              <p key={`left-${index}`}>{paragraph}</p>
+              <Reveal key={`left-${index}`} delay={120 + index * 70}>
+                <p>{paragraph}</p>
+              </Reveal>
             ))}
           </div>
           <div className="about__column">
             {rightParagraphs.map((paragraph, index) => (
-              <p key={`right-${index}`}>{paragraph}</p>
+              <Reveal key={`right-${index}`} delay={160 + index * 70}>
+                <p>{paragraph}</p>
+              </Reveal>
             ))}
           </div>
         </div>

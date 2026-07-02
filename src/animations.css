@@ -1,0 +1,131 @@
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-fast: 0.25s;
+  --motion-base: 0.45s;
+  --motion-slow: 0.7s;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.page-transition {
+  animation: fade-in var(--motion-base) var(--ease-out) both;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--motion-slow) var(--ease-out),
+    transform var(--motion-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sidebar {
+  animation: slide-in-left var(--motion-slow) var(--ease-out) both;
+}
+
+.intro__contact-link {
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.intro__contact-link:hover {
+  opacity: 0.72;
+  transform: translateX(2px);
+}
+
+.intro__link,
+.about__back,
+.sidebar__link {
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.intro__link:hover,
+.about__back:hover {
+  transform: translateX(2px);
+}
+
+.sidebar__link:hover {
+  transform: translateX(3px);
+}
+
+.projects-tabs__tab {
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.projects-tabs__tab:active {
+  transform: scale(0.97);
+}
+
+.project-card__visual {
+  transition: transform var(--motion-base) var(--ease-out);
+}
+
+.project-card:hover .project-card__visual,
+.project-card:focus-within .project-card__visual {
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
